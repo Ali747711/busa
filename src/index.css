@@ -1,0 +1,440 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900 font-sans;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+}
+
+@layer components {
+  /* BUSA Primary Red Buttons - like logo background */
+  .btn-primary {
+    @apply bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 shadow-lg hover:shadow-xl;
+  }
+
+  /* BUSA Secondary Amber Buttons */
+  .btn-secondary {
+    @apply bg-secondary-500 hover:bg-secondary-600 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-secondary-400 focus:ring-offset-2 shadow-lg hover:shadow-xl;
+  }
+
+  /* BUSA Accent Blue Buttons */
+  .btn-accent {
+    @apply bg-accent-500 hover:bg-accent-600 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent-400 focus:ring-offset-2 shadow-lg hover:shadow-xl;
+  }
+
+  /* White buttons with red text (like logo contrast) */
+  .btn-white-red {
+    @apply bg-white text-primary-600 hover:bg-red-50 hover:text-primary-700 font-bold py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 shadow-lg hover:shadow-xl;
+  }
+
+  /* Red outline buttons */
+  .btn-outline {
+    @apply border-2 border-primary-500 text-primary-600 hover:bg-primary-500 hover:text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2;
+  }
+
+  /* White outline buttons (for dark backgrounds) */
+  .btn-outline-white {
+    @apply border-2 border-white text-white hover:bg-white hover:text-primary-600 font-bold py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2;
+  }
+
+  /* Enhanced cards with BUSA styling */
+  .card {
+    @apply bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300;
+  }
+
+  .card-red {
+    @apply bg-white rounded-xl shadow-lg border-l-4 border-primary-500 p-6 hover:shadow-xl hover:border-primary-600 transition-all duration-300;
+  }
+
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* BUSA Speaking Club specific gradients */
+  .gradient-primary {
+    @apply bg-gradient-to-r from-primary-500 to-primary-600;
+  }
+
+  .gradient-secondary {
+    @apply bg-gradient-to-r from-secondary-500 to-secondary-600;
+  }
+
+  .gradient-accent {
+    @apply bg-gradient-to-r from-accent-500 to-accent-600;
+  }
+
+  /* BUSA Hero gradient (like logo background) */
+  .gradient-hero {
+    @apply bg-gradient-to-br from-primary-500 via-primary-600 to-primary-700;
+  }
+
+  /* Speech bubble effect (inspired by logo elements) */
+  .speech-bubble {
+    @apply relative bg-primary-500 text-white p-4 rounded-lg;
+  }
+
+  .speech-bubble::before {
+    content: '';
+    @apply absolute bottom-0 left-4 w-0 h-0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid theme('colors.primary.500');
+    transform: translateY(100%);
+  }
+
+  .container-custom {
+    @apply container mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-100 p-6;
+  }
+
+  .btn-primary {
+    @apply bg-primary-600 hover:bg-primary-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md;
+  }
+
+  .btn-outline {
+    @apply border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium py-2 px-6 rounded-lg transition-colors duration-200;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  /* BUSA brand utilities */
+  .text-busa-red {
+    @apply text-primary-600;
+  }
+  
+  .bg-busa-red {
+    @apply bg-primary-500;
+  }
+  
+  .border-busa-red {
+    @apply border-primary-500;
+  }
+}
+
+/* Mobile-Optimized React Calendar Styles */
+@layer components {
+  .calendar-container {
+    @apply w-full overflow-hidden;
+  }
+
+  /* Mobile-first calendar styling */
+  .react-calendar {
+    @apply w-full max-w-full bg-transparent border-0 font-sans;
+    font-family: inherit;
+  }
+
+  /* Mobile-optimized navigation */
+  .react-calendar__navigation {
+    @apply flex items-center justify-between mb-4 px-2;
+    height: auto;
+  }
+
+  .react-calendar__navigation button {
+    @apply min-w-0 bg-transparent border-0 p-2 sm:p-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200 flex-shrink-0;
+    font-size: inherit;
+    font-family: inherit;
+  }
+
+  .react-calendar__navigation button:enabled:hover,
+  .react-calendar__navigation button:enabled:focus {
+    @apply bg-gray-100 text-gray-900;
+  }
+
+  .react-calendar__navigation button:disabled {
+    @apply text-gray-400 cursor-not-allowed;
+  }
+
+  .react-calendar__navigation__label {
+    @apply text-base sm:text-lg font-semibold text-gray-900 px-2 py-2 rounded-lg hover:bg-gray-50 transition-colors duration-200 flex-grow text-center;
+    pointer-events: auto;
+  }
+
+  /* Mobile month/year view */
+  .react-calendar__viewContainer {
+    @apply w-full;
+  }
+
+  .react-calendar__month-view {
+    @apply w-full;
+  }
+
+  /* Mobile weekdays header */
+  .react-calendar__month-view__weekdays {
+    @apply grid grid-cols-7 gap-1 mb-2 text-center;
+  }
+
+  .react-calendar__month-view__weekdays__weekday {
+    @apply p-2 sm:p-3 text-xs sm:text-sm font-medium text-gray-600 bg-gray-50 rounded-lg;
+    text-decoration: none;
+    border: none;
+    background: transparent;
+  }
+
+  .react-calendar__month-view__weekdays__weekday abbr {
+    text-decoration: none;
+  }
+
+  /* Mobile calendar grid */
+  .react-calendar__month-view__days {
+    @apply grid grid-cols-7 gap-1;
+  }
+
+  .react-calendar__tile {
+    @apply relative p-2 sm:p-3 text-center bg-white border border-gray-100 rounded-lg text-sm sm:text-base font-medium text-gray-700 hover:bg-gray-50 transition-all duration-200 cursor-pointer min-h-0;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    max-width: 100%;
+    height: auto;
+    min-height: 40px;
+    background: white;
+    border: 1px solid #f3f4f6;
+  }
+
+  @media (min-width: 640px) {
+    .react-calendar__tile {
+      min-height: 48px;
+    }
+  }
+
+  /* Mobile tile states */
+  .react-calendar__tile:enabled:hover,
+  .react-calendar__tile:enabled:focus {
+    @apply bg-gray-50 border-gray-200 scale-105;
+  }
+
+  .react-calendar__tile--active {
+    @apply bg-primary-500 text-white border-primary-500 font-semibold;
+  }
+
+  .react-calendar__tile--active:enabled:hover,
+  .react-calendar__tile--active:enabled:focus {
+    @apply bg-primary-600 border-primary-600;
+  }
+
+  /* Today's date styling */
+  .react-calendar__tile--now {
+    @apply bg-secondary-50 text-secondary-700 border-secondary-200 font-semibold;
+  }
+
+  .react-calendar__tile--now:enabled:hover,
+  .react-calendar__tile--now:enabled:focus {
+    @apply bg-secondary-100 border-secondary-300;
+  }
+
+  /* Custom event indicator classes */
+  .react-calendar__tile.has-single-event {
+    @apply border-primary-300 bg-primary-50;
+  }
+
+  .react-calendar__tile.has-multiple-events {
+    @apply border-purple-300 bg-purple-50;
+  }
+
+  /* New event type-specific classes */
+  .react-calendar__tile.has-online-events {
+    @apply border-primary-300 bg-primary-50 text-primary-700;
+  }
+
+  .react-calendar__tile.has-offline-events {
+    @apply border-secondary-300 bg-secondary-50 text-secondary-700;
+  }
+
+  .react-calendar__tile.has-mixed-events {
+    @apply border-purple-300 bg-gradient-to-br from-primary-50 to-secondary-50 text-gray-700;
+  }
+
+  .react-calendar__tile.selected-date {
+    @apply bg-primary-500 text-white border-primary-500 font-bold;
+  }
+
+  .react-calendar__tile.today-date {
+    @apply bg-gradient-to-br from-yellow-100 to-yellow-200 text-yellow-800 border-yellow-300 font-bold shadow-sm;
+  }
+
+  /* Event indicators */
+  .event-indicator {
+    @apply absolute bottom-1 left-1/2 transform -translate-x-1/2;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  @media (min-width: 640px) {
+    .event-indicator {
+      width: 8px;
+      height: 8px;
+    }
+  }
+
+  .event-indicator.single-event {
+    @apply bg-primary-500 shadow-sm;
+    animation: pulse-gentle 2s infinite;
+  }
+
+  .event-indicator.multiple-events {
+    @apply bg-gradient-to-r from-red-400 via-yellow-400 via-green-400 via-blue-400 to-purple-400;
+    animation: shimmer 3s infinite;
+  }
+
+  /* New event type indicators */
+  .event-indicator.online-events {
+    @apply bg-primary-500 shadow-sm;
+    animation: pulse-gentle 2s infinite;
+  }
+
+  .event-indicator.offline-events {
+    @apply bg-secondary-500 shadow-sm;
+    animation: pulse-gentle 2s infinite;
+  }
+
+  .event-indicator.mixed-events {
+    @apply bg-gradient-to-r from-primary-500 to-secondary-500;
+    animation: shimmer 3s infinite;
+  }
+
+  /* Mobile calendar animations */
+  @keyframes pulse-gentle {
+    0%, 100% {
+      transform: translateX(-50%) scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: translateX(-50%) scale(1.1);
+      opacity: 0.8;
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% center;
+    }
+    100% {
+      background-position: 200% center;
+    }
+  }
+
+  /* Remove neighboring month dates on mobile */
+  .react-calendar__month-view__days__day--neighboringMonth {
+    @apply opacity-30 text-gray-400;
+  }
+
+  /* Mobile accessibility improvements */
+  .react-calendar__tile:focus {
+    @apply outline-none ring-2 ring-primary-500 ring-offset-2;
+  }
+
+  /* Mobile month/year picker (if enabled) */
+  .react-calendar__year-view .react-calendar__tile,
+  .react-calendar__decade-view .react-calendar__tile,
+  .react-calendar__century-view .react-calendar__tile {
+    @apply p-3 sm:p-4;
+  }
+}
+
+/* Mobile scroll improvements */
+@layer utilities {
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+
+  .active\:scale-98:active {
+    transform: scale(0.98);
+  }
+
+  .active\:scale-95:active {
+    transform: scale(0.95);
+  }
+
+  /* Mobile-specific responsive utilities */
+  @media (max-width: 640px) {
+    .mobile-text-xs {
+      font-size: 0.75rem;
+      line-height: 1rem;
+    }
+    
+    .mobile-p-2 {
+      padding: 0.5rem;
+    }
+    
+    .mobile-gap-1 {
+      gap: 0.25rem;
+    }
+  }
+}
+
+/* Fix any potential overflow issues */
+@layer base {
+  html {
+    @apply overflow-x-hidden;
+  }
+  
+  body {
+    @apply overflow-x-hidden;
+  }
+
+  * {
+    @apply max-w-full;
+  }
+
+  /* Ensure all containers don't overflow */
+  .container,
+  .container-custom {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* Mobile-optimized focus styles */
+@layer base {
+  button:focus,
+  a:focus,
+  input:focus,
+  textarea:focus,
+  select:focus {
+    @apply outline-none ring-2 ring-primary-500 ring-offset-2;
+  }
+
+  /* Better mobile tap targets */
+  button,
+  a,
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  @media (max-width: 640px) {
+    button,
+    a {
+      min-height: 48px;
+    }
+  }
+}

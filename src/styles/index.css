@@ -1,0 +1,660 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900 font-sans;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+}
+
+/* Mobile Scrolling Utilities */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Safari and Chrome */
+}
+
+@layer components {
+  /* BUSA Primary Red Buttons - like logo background */
+  .btn-primary {
+    @apply bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 shadow-lg hover:shadow-xl;
+  }
+
+  /* BUSA Secondary Amber Buttons */
+  .btn-secondary {
+    @apply bg-secondary-500 hover:bg-secondary-600 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-secondary-400 focus:ring-offset-2 shadow-lg hover:shadow-xl;
+  }
+
+  /* BUSA Accent Blue Buttons */
+  .btn-accent {
+    @apply bg-accent-500 hover:bg-accent-600 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent-400 focus:ring-offset-2 shadow-lg hover:shadow-xl;
+  }
+
+  /* White buttons with red text (like logo contrast) */
+  .btn-white-red {
+    @apply bg-white text-primary-600 hover:bg-red-50 hover:text-primary-700 font-bold py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 shadow-lg hover:shadow-xl;
+  }
+
+  /* Red outline buttons */
+  .btn-outline {
+    @apply border-2 border-primary-500 text-primary-600 hover:bg-primary-500 hover:text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2;
+  }
+
+  /* White outline buttons (for dark backgrounds) */
+  .btn-outline-white {
+    @apply border-2 border-white text-white hover:bg-white hover:text-primary-600 font-bold py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2;
+  }
+
+  /* Enhanced cards with BUSA styling */
+  .card {
+    @apply bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300;
+  }
+
+  .card-red {
+    @apply bg-white rounded-xl shadow-lg border-l-4 border-primary-500 p-6 hover:shadow-xl hover:border-primary-600 transition-all duration-300;
+  }
+
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* BUSA Speaking Club specific gradients */
+  .gradient-primary {
+    @apply bg-gradient-to-r from-primary-500 to-primary-600;
+  }
+
+  .gradient-secondary {
+    @apply bg-gradient-to-r from-secondary-500 to-secondary-600;
+  }
+
+  .gradient-accent {
+    @apply bg-gradient-to-r from-accent-500 to-accent-600;
+  }
+
+  /* BUSA Hero gradient (like logo background) */
+  .gradient-hero {
+    @apply bg-gradient-to-br from-primary-500 via-primary-600 to-primary-700;
+  }
+
+  /* Speech bubble effect (inspired by logo elements) */
+  .speech-bubble {
+    @apply relative bg-primary-500 text-white p-4 rounded-lg;
+  }
+
+  .speech-bubble::before {
+    content: '';
+    @apply absolute bottom-0 left-4 w-0 h-0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid theme('colors.primary.500');
+    transform: translateY(100%);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  /* BUSA brand utilities */
+  .text-busa-red {
+    @apply text-primary-600;
+  }
+  
+  .bg-busa-red {
+    @apply bg-primary-500;
+  }
+  
+  .border-busa-red {
+    @apply border-primary-500;
+  }
+}
+
+/* ===== STUNNING CALENDAR REDESIGN ===== */
+
+/* Reset calendar defaults */
+.react-calendar {
+  width: 100% !important;
+  max-width: 100% !important;
+  background: linear-gradient(145deg, #ffffff 0%, #fafbfc 50%, #f7f9fb 100%) !important;
+  border: none !important;
+  border-radius: 24px !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif !important;
+  box-shadow: 
+    0 32px 64px rgba(0, 0, 0, 0.12),
+    0 16px 32px rgba(0, 0, 0, 0.08),
+    0 8px 16px rgba(0, 0, 0, 0.04),
+    0 0 0 1px rgba(255, 255, 255, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+  overflow: hidden !important;
+  position: relative !important;
+  backdrop-filter: blur(20px) !important;
+}
+
+/* Stunning background overlay */
+.react-calendar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 20%, rgba(239, 68, 68, 0.03) 0%, transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(245, 158, 11, 0.02) 0%, transparent 40%),
+    linear-gradient(135deg, rgba(59, 130, 246, 0.01) 0%, rgba(239, 68, 68, 0.01) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Premium navigation header */
+.react-calendar__navigation {
+  display: flex !important;
+  height: 80px !important;
+  margin-bottom: 0 !important;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 30%, #b91c1c 70%, #991b1b 100%) !important;
+  padding: 0 32px !important;
+  position: relative !important;
+  border-radius: 24px 24px 0 0 !important;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 8px 32px rgba(239, 68, 68, 0.4) !important;
+}
+
+/* Navigation background effects */
+.react-calendar__navigation::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+    linear-gradient(45deg, rgba(255, 255, 255, 0.05) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+/* Premium navigation buttons */
+.react-calendar__navigation button {
+  min-width: 56px !important;
+  height: 56px !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: white !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border-radius: 16px !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  margin: 0 6px !important;
+  position: relative !important;
+  z-index: 2 !important;
+  overflow: hidden !important;
+}
+
+.react-calendar__navigation button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.6s;
+}
+
+.react-calendar__navigation button:enabled:hover::before {
+  left: 100%;
+}
+
+.react-calendar__navigation button:enabled:hover,
+.react-calendar__navigation button:enabled:focus {
+  background: rgba(255, 255, 255, 0.25) !important;
+  transform: translateY(-4px) scale(1.05) !important;
+  box-shadow: 
+    0 16px 32px rgba(0, 0, 0, 0.3),
+    0 8px 16px rgba(255, 255, 255, 0.2) !important;
+}
+
+.react-calendar__navigation button[disabled] {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: rgba(255, 255, 255, 0.3) !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+/* Enhanced month/year label */
+.react-calendar__navigation__label {
+  font-size: 24px !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.5px !important;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+  background-clip: text !important;
+  -webkit-background-clip: text !important;
+}
+
+/* Beautiful weekday headers */
+.react-calendar__month-view__weekdays {
+  text-align: center !important;
+  text-transform: uppercase !important;
+  font-weight: 800 !important;
+  font-size: 13px !important;
+  color: #64748b !important;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%) !important;
+  border-bottom: 3px solid #e2e8f0 !important;
+  letter-spacing: 1px !important;
+  position: relative !important;
+}
+
+.react-calendar__month-view__weekdays__weekday {
+  padding: 20px 12px !important;
+  position: relative !important;
+  transition: all 0.3s ease !important;
+}
+
+.react-calendar__month-view__weekdays__weekday::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #ef4444, transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.react-calendar__month-view__weekdays__weekday:hover::before {
+  opacity: 0.8;
+}
+
+/* Weekend styling */
+.react-calendar__month-view__days__day--weekend {
+  color: #ef4444 !important;
+  font-weight: 700 !important;
+}
+
+.react-calendar__month-view__days__day--neighboringMonth {
+  color: #cbd5e1 !important;
+  opacity: 0.4 !important;
+}
+
+/* Premium calendar tiles */
+.react-calendar__tile {
+  max-width: 100% !important;
+  padding: 16px 8px !important;
+  background: transparent !important;
+  text-align: center !important;
+  line-height: 1.2 !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: #1e293b !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative !important;
+  border-radius: 12px !important;
+  margin: 3px !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+  border: 2px solid transparent !important;
+}
+
+.react-calendar__tile::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, 
+    rgba(239, 68, 68, 0.03) 0%, 
+    rgba(245, 158, 11, 0.02) 50%, 
+    rgba(59, 130, 246, 0.03) 100%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: -1;
+}
+
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 50%, #fde2e4 100%) !important;
+  color: #b91c1c !important;
+  transform: translateY(-6px) scale(1.08) !important;
+  box-shadow: 
+    0 20px 40px rgba(239, 68, 68, 0.2),
+    0 10px 20px rgba(239, 68, 68, 0.1),
+    0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+  border-color: rgba(239, 68, 68, 0.2) !important;
+  z-index: 10 !important;
+}
+
+.react-calendar__tile:enabled:hover::before,
+.react-calendar__tile:enabled:focus::before {
+  opacity: 1;
+}
+
+/* Today's date - Golden highlight */
+.react-calendar__tile--now {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 30%, #b45309 70%, #92400e 100%) !important;
+  color: white !important;
+  font-weight: 900 !important;
+  box-shadow: 
+    0 16px 32px rgba(245, 158, 11, 0.5),
+    0 8px 16px rgba(245, 158, 11, 0.3),
+    0 0 0 4px rgba(245, 158, 11, 0.2),
+    inset 0 2px 0 rgba(255, 255, 255, 0.3) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  transform: scale(1.05) !important;
+}
+
+.react-calendar__tile--now::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4) 0%, transparent 60%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.react-calendar__tile--now:enabled:hover,
+.react-calendar__tile--now:enabled:focus {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 30%, #92400e 70%, #78350f 100%) !important;
+  transform: translateY(-8px) scale(1.12) !important;
+  box-shadow: 
+    0 24px 48px rgba(245, 158, 11, 0.6),
+    0 12px 24px rgba(245, 158, 11, 0.4),
+    0 0 0 4px rgba(245, 158, 11, 0.3) !important;
+}
+
+/* Selected date - Premium red styling */
+.react-calendar__tile--hasActive,
+.react-calendar__tile--active {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 30%, #b91c1c 70%, #991b1b 100%) !important;
+  color: white !important;
+  font-weight: 900 !important;
+  box-shadow: 
+    0 16px 32px rgba(239, 68, 68, 0.5),
+    0 8px 16px rgba(239, 68, 68, 0.3),
+    0 0 0 4px rgba(239, 68, 68, 0.2),
+    inset 0 2px 0 rgba(255, 255, 255, 0.3) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  transform: scale(1.05) !important;
+}
+
+.react-calendar__tile--hasActive::before,
+.react-calendar__tile--active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4) 0%, transparent 60%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.react-calendar__tile--hasActive:enabled:hover,
+.react-calendar__tile--hasActive:enabled:focus,
+.react-calendar__tile--active:enabled:hover,
+.react-calendar__tile--active:enabled:focus {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 30%, #991b1b 70%, #7f1d1d 100%) !important;
+  transform: translateY(-8px) scale(1.12) !important;
+  box-shadow: 
+    0 24px 48px rgba(239, 68, 68, 0.6),
+    0 12px 24px rgba(239, 68, 68, 0.4),
+    0 0 0 4px rgba(239, 68, 68, 0.3) !important;
+}
+
+/* Range selection styling */
+.react-calendar--selectRange .react-calendar__tile--hover {
+  background: linear-gradient(135deg, #fef2f2, #fee2e2) !important;
+  color: #dc2626 !important;
+}
+
+/* ===== STUNNING EVENT INDICATORS ===== */
+
+/* Single event - Pulsing jewel */
+.react-calendar__tile--hasEvent {
+  position: relative !important;
+}
+
+.react-calendar__tile--hasEvent::after {
+  content: '';
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 10px;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
+  border-radius: 50%;
+  box-shadow: 
+    0 0 0 3px white,
+    0 0 0 5px rgba(239, 68, 68, 0.3),
+    0 6px 12px rgba(239, 68, 68, 0.4);
+  animation: pulse-glow 2.5s infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+    box-shadow: 
+      0 0 0 3px white,
+      0 0 0 5px rgba(239, 68, 68, 0.3),
+      0 6px 12px rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateX(-50%) scale(1.2);
+    box-shadow: 
+      0 0 0 3px white,
+      0 0 0 8px rgba(239, 68, 68, 0.2),
+      0 8px 16px rgba(239, 68, 68, 0.5);
+  }
+}
+
+/* Event indicators on special dates */
+.react-calendar__tile--hasEvent.react-calendar__tile--now::after {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  box-shadow: 
+    0 0 0 3px rgba(245, 158, 11, 0.9),
+    0 0 0 6px rgba(245, 158, 11, 0.3),
+    0 6px 12px rgba(255, 255, 255, 0.5);
+}
+
+.react-calendar__tile--hasEvent.react-calendar__tile--active::after,
+.react-calendar__tile--hasEvent.react-calendar__tile--hasActive::after {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  box-shadow: 
+    0 0 0 3px rgba(239, 68, 68, 0.9),
+    0 0 0 6px rgba(239, 68, 68, 0.3),
+    0 6px 12px rgba(255, 255, 255, 0.5);
+}
+
+/* Multiple events - Rainbow spectrum bar */
+.react-calendar__tile--hasMultipleEvents::after {
+  content: '';
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 6px;
+  background: linear-gradient(90deg, 
+    #ef4444 0%, 
+    #f59e0b 20%, 
+    #22c55e 40%, 
+    #3b82f6 60%, 
+    #8b5cf6 80%, 
+    #ec4899 100%);
+  border-radius: 6px;
+  box-shadow: 
+    0 0 0 2px white,
+    0 4px 8px rgba(0, 0, 0, 0.2),
+    0 0 20px rgba(239, 68, 68, 0.3);
+  animation: rainbow-shimmer 3s infinite;
+}
+
+@keyframes rainbow-shimmer {
+  0%, 100% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+    filter: saturate(1) brightness(1);
+  }
+  33% {
+    opacity: 0.9;
+    transform: translateX(-50%) scale(1.1);
+    filter: saturate(1.2) brightness(1.1);
+  }
+  66% {
+    opacity: 0.95;
+    transform: translateX(-50%) scale(1.05);
+    filter: saturate(1.1) brightness(1.05);
+  }
+}
+
+.react-calendar__tile--hasMultipleEvents.react-calendar__tile--now::after,
+.react-calendar__tile--hasMultipleEvents.react-calendar__tile--active::after,
+.react-calendar__tile--hasMultipleEvents.react-calendar__tile--hasActive::after {
+  box-shadow: 
+    0 0 0 2px rgba(255, 255, 255, 0.95),
+    0 4px 8px rgba(0, 0, 0, 0.25),
+    0 0 20px rgba(239, 68, 68, 0.4);
+}
+
+/* Loading state with elegant spinner */
+.react-calendar--loading {
+  opacity: 0.7 !important;
+  pointer-events: none !important;
+  position: relative !important;
+}
+
+.react-calendar--loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 64px;
+  height: 64px;
+  border: 4px solid rgba(239, 68, 68, 0.1);
+  border-top: 4px solid #ef4444;
+  border-radius: 50%;
+  animation: elegant-spin 1.2s linear infinite;
+  z-index: 100;
+}
+
+@keyframes elegant-spin {
+  0% { 
+    transform: translate(-50%, -50%) rotate(0deg);
+    border-top-color: #ef4444;
+  }
+  25% {
+    border-top-color: #f59e0b;
+  }
+  50% { 
+    transform: translate(-50%, -50%) rotate(180deg);
+    border-top-color: #22c55e;
+  }
+  75% {
+    border-top-color: #3b82f6;
+  }
+  100% { 
+    transform: translate(-50%, -50%) rotate(360deg);
+    border-top-color: #ef4444;
+  }
+}
+
+/* ===== RESPONSIVE EXCELLENCE ===== */
+@media (max-width: 768px) {
+  .react-calendar {
+    border-radius: 20px !important;
+  }
+  
+  .react-calendar__navigation {
+    height: 64px !important;
+    padding: 0 20px !important;
+    border-radius: 20px 20px 0 0 !important;
+  }
+  
+  .react-calendar__navigation button {
+    min-width: 48px !important;
+    height: 48px !important;
+    font-size: 14px !important;
+    border-radius: 12px !important;
+    margin: 0 4px !important;
+  }
+  
+  .react-calendar__navigation__label {
+    font-size: 18px !important;
+  }
+  
+  .react-calendar__tile {
+    padding: 12px 4px !important;
+    font-size: 13px !important;
+    border-radius: 8px !important;
+    margin: 2px !important;
+  }
+  
+  .react-calendar__tile--hasEvent::after {
+    width: 8px !important;
+    height: 8px !important;
+    bottom: 6px !important;
+  }
+  
+  .react-calendar__tile--hasMultipleEvents::after {
+    width: 20px !important;
+    height: 4px !important;
+    bottom: 4px !important;
+  }
+}
+
+/* ===== DARK MODE SUPPORT ===== */
+@media (prefers-color-scheme: dark) {
+  .react-calendar {
+    background: linear-gradient(145deg, #1e293b 0%, #0f172a 50%, #020617 100%) !important;
+    color: #f8fafc !important;
+    box-shadow: 
+      0 32px 64px rgba(0, 0, 0, 0.5),
+      0 16px 32px rgba(0, 0, 0, 0.3),
+      0 8px 16px rgba(0, 0, 0, 0.2),
+      0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+  }
+  
+  .react-calendar__month-view__weekdays {
+    background: linear-gradient(180deg, #374151 0%, #1f2937 100%) !important;
+    color: #d1d5db !important;
+    border-bottom-color: #4b5563 !important;
+  }
+  
+  .react-calendar__tile {
+    color: #f1f5f9 !important;
+  }
+  
+  .react-calendar__tile:enabled:hover,
+  .react-calendar__tile:enabled:focus {
+    background: linear-gradient(135deg, #374151 0%, #4b5563 100%) !important;
+    color: #f8fafc !important;
+  }
+} 
