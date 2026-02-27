@@ -2,96 +2,96 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Helper function to check if user is a mentor
-    // TO ADD NEW MENTORS: Add their email to the list below and deploy rules
-    function isMentor() {
-      return request.auth != null && 
-        request.auth.token.email in [
-          // Original mentors
-          'aziz.karimov@busa.kr',
-          'malika.uzbekova@busa.kr', 
-          'bekzod.tashkentov@busa.kr',
-          'admin@busa.kr',
-          'alexnabiyev5@gmail.com',
-          // New mentors
-          'mentor1@busa.kr',
-          'mentor2@busa.kr',
-          'mentor3@busa.kr',
-          'mentor4@busa.kr'
-        ];
+
+    // Check user's role from Firestore — single source of truth.
+    // Uses exists() guard so rules don't throw when the user document hasn't been created yet.
+    function userDoc() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid));
     }
 
-    // Allow public read access to sessions and events
+    function isMentor() {
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        userDoc().data.role in ['mentor', 'admin'];
+    }
+
+    function isAdmin() {
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        userDoc().data.role == 'admin';
+    }
+
+    // Sessions — public read, mentor write.
+    // Unauthenticated users may update only currentAttendees (registration flow).
     match /sessions/{document} {
       allow read: if true;
-      allow write: if isMentor();
-      // Allow updating currentAttendees field for registration system
-      allow update: if request.writeFields.size() == 1 &&
-        'currentAttendees' in request.writeFields;
+      allow create, delete: if isMentor();
+      allow update: if isMentor() ||
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['currentAttendees']);
     }
-    
+
+    // Events — same policy as sessions
     match /events/{document} {
       allow read: if true;
-      allow write: if isMentor();
-      // Allow updating currentAttendees field for registration system
-      allow update: if request.writeFields.size() == 1 &&
-        'currentAttendees' in request.writeFields;
+      allow create, delete: if isMentor();
+      allow update: if isMentor() ||
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['currentAttendees']);
     }
-    
-    // Allow public read access to mentors and content
+
     match /mentors/{document} {
       allow read: if true;
       allow write: if isMentor();
     }
-    
+
     match /content/{document} {
       allow read: if true;
       allow write: if isMentor();
     }
 
-    // Allow public read access to site configuration
     match /siteConfig/{document} {
       allow read: if true;
       allow write: if isMentor();
     }
 
-    // Allow public read access to success stories
     match /success-stories/{document} {
       allow read: if true;
       allow write: if isMentor();
     }
-    
-    // Allow public registration creation and mentor management
+
+    // Registrations — anyone can submit; only mentors can manage
     match /registrations/{document} {
-      allow create: if true; // Allow anyone to create registrations
+      allow create: if true;
       allow read, update, delete: if isMentor();
     }
 
-    // Photos collection (if enabled)
     match /photos/{photoId} {
       allow read: if true;
       allow write: if isMentor();
     }
 
-    // Travel coordination collection
     match /travel/{travelId} {
-      allow read: if isMentor();
-      allow write: if isMentor();
+      allow read, write: if isMentor();
     }
 
-    // Forms collection
     match /forms/{formId} {
-      allow read: if isMentor();
-      allow write: if isMentor();
+      allow read, write: if isMentor();
     }
 
-    // Users collection for auth context
+    // Users collection:
+    // - Each user can read/write their own document (for role bootstrap & lastLogin)
+    // - Mentors can read all users
+    // - Only admins can change someone's role to 'admin'
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
-      allow read, update: if isMentor(); // Only verified mentors can read and update user roles
+      allow read: if isMentor();
+      allow update: if isMentor() &&
+        (
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']) ||
+          (request.resource.data.role != 'admin' || isAdmin())
+        );
     }
 
-    // Deny all other requests by default
+    // Deny everything else
     match /{document=**} {
       allow read, write: if false;
     }

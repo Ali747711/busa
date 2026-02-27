@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-import { 
+import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signInWithPopup,
@@ -19,87 +19,101 @@ export const useAuth = () => {
   return context
 }
 
+// The root manager email from env — always gets admin role, is the only one who can access /setup.
+const ROOT_MANAGER_EMAIL = import.meta.env.VITE_ROOT_MANAGER_EMAIL
+
+// Legacy fallback list — only used when a user has no Firestore document yet.
+// New mentors should be assigned via UserManager (sets role in Firestore).
+const LEGACY_MENTOR_EMAILS = [
+  'aziz.karimov@busa.kr',
+  'malika.uzbekova@busa.kr',
+  'bekzod.tashkentov@busa.kr',
+  'admin@busa.kr',
+  'alexnabiyev5@gmail.com',
+]
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [userRole, setUserRole] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  // Predefined mentor emails (LEGACY - now only used as fallback)
-  // The primary source of mentor roles is now Firestore user documents
-  // This list is only used when no Firestore document exists
-  const mentorEmails = [
-    'aziz.karimov@busa.kr',
-    'malika.uzbekova@busa.kr', 
-    'bekzod.tashkentov@busa.kr',
-    'admin@busa.kr',
-    'alexnabiyev5@gmail.com'
-    // Note: New mentors created through /setup will get proper Firestore roles
-  ]
-
-  // Get user role from Firestore or determine from email
-  const getUserRole = async (user) => {
+  // Get user role from Firestore; fall back to legacy email list for first-time users
+  const getUserRole = async (firebaseUser) => {
     try {
-      // First check Firestore for role (this is now the primary source of truth)
-      const userDoc = await getDoc(doc(db, 'users', user.uid))
-      
+      const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid))
+
       if (userDoc.exists()) {
-        const userData = userDoc.data()
-        // If user has a role in Firestore, use it
-        if (userData.role) {
-          return userData.role
-        }
+        const data = userDoc.data()
+        if (data.role) return data.role
       }
-      
-      // If no Firestore document exists or no role specified, check hardcoded mentor list
-      const isMentor = mentorEmails.includes(user.email.toLowerCase())
-      const role = isMentor ? 'mentor' : 'member'
-      
-      // Create user document in Firestore for future reference
-      await setDoc(doc(db, 'users', user.uid), {
-        email: user.email,
-        displayName: user.displayName || '',
-        role: role,
+
+      // Root manager always gets admin — bootstraps the project without pre-existing Firestore data
+      if (ROOT_MANAGER_EMAIL &&
+          firebaseUser.email.toLowerCase() === ROOT_MANAGER_EMAIL.toLowerCase()) {
+        await setDoc(doc(db, 'users', firebaseUser.uid), {
+          email: firebaseUser.email,
+          displayName: firebaseUser.displayName || '',
+          role: 'admin',
+          createdAt: new Date(),
+          lastLogin: new Date(),
+          createdBy: 'root-manager',
+        })
+        return 'admin'
+      }
+
+      // No Firestore document yet — bootstrap from legacy list
+      const role = LEGACY_MENTOR_EMAILS.includes(firebaseUser.email.toLowerCase())
+        ? 'mentor'
+        : 'member'
+
+      await setDoc(doc(db, 'users', firebaseUser.uid), {
+        email: firebaseUser.email,
+        displayName: firebaseUser.displayName || '',
+        role,
         createdAt: new Date(),
         lastLogin: new Date(),
-        createdBy: 'auto-assignment'  // Track automatic role assignment
+        createdBy: 'auto-assignment',
       })
-      
+
       return role
-    } catch (error) {
-      console.error('Error getting user role:', error)
-      // Fallback to email check
-      return mentorEmails.includes(user.email.toLowerCase()) ? 'mentor' : 'member'
+    } catch (err) {
+      console.error('Error getting user role:', err)
+      // Last-resort fallback — avoids blocking login on Firestore errors
+      if (ROOT_MANAGER_EMAIL &&
+          firebaseUser.email.toLowerCase() === ROOT_MANAGER_EMAIL.toLowerCase()) {
+        return 'admin'
+      }
+      return LEGACY_MENTOR_EMAILS.includes(firebaseUser.email.toLowerCase())
+        ? 'mentor'
+        : 'member'
     }
   }
 
-  // Update last login time
   const updateLastLogin = async (userId) => {
     try {
-      await setDoc(doc(db, 'users', userId), {
-        lastLogin: new Date()
-      }, { merge: true })
-    } catch (error) {
-      console.error('Error updating last login:', error)
+      await setDoc(doc(db, 'users', userId), { lastLogin: new Date() }, { merge: true })
+    } catch (err) {
+      console.error('Error updating last login:', err)
     }
   }
 
-  // Auth state listener
+  // onAuthStateChanged owns the loading state — sign-in helpers must not touch it
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       try {
-        if (user) {
-          setUser(user)
-          const role = await getUserRole(user)
+        if (firebaseUser) {
+          setUser(firebaseUser)
+          const role = await getUserRole(firebaseUser)
           setUserRole(role)
-          await updateLastLogin(user.uid)
+          await updateLastLogin(firebaseUser.uid)
         } else {
           setUser(null)
           setUserRole(null)
         }
-      } catch (error) {
-        console.error('Auth state change error:', error)
-        setError(error.message)
+      } catch (err) {
+        console.error('Auth state change error:', err)
+        setError(err.message)
       } finally {
         setLoading(false)
       }
@@ -108,79 +122,68 @@ export const AuthProvider = ({ children }) => {
     return unsubscribe
   }, [])
 
-  // Sign in with email and password
   const signInWithEmail = async (email, password) => {
     try {
       setError(null)
-      setLoading(true)
-      const result = await signInWithEmailAndPassword(auth, email, password)
-      return result
-    } catch (error) {
-      setError(error.message)
-      throw error
-    } finally {
-      setLoading(false)
+      return await signInWithEmailAndPassword(auth, email, password)
+    } catch (err) {
+      setError(err.message)
+      throw err
     }
   }
 
-  // Sign in with Google
   const signInWithGoogle = async () => {
     try {
       setError(null)
-      setLoading(true)
-      const result = await signInWithPopup(auth, googleProvider)
-      return result
-    } catch (error) {
-      setError(error.message)
-      throw error
-    } finally {
-      setLoading(false)
+      return await signInWithPopup(auth, googleProvider)
+    } catch (err) {
+      setError(err.message)
+      throw err
     }
   }
 
-  // Sign up with email and password
   const signUpWithEmail = async (email, password, displayName = '') => {
     try {
       setError(null)
-      setLoading(true)
       const result = await createUserWithEmailAndPassword(auth, email, password)
-      
-      // Create user document
+
       await setDoc(doc(db, 'users', result.user.uid), {
-        email: email,
-        displayName: displayName,
-        role: mentorEmails.includes(email.toLowerCase()) ? 'mentor' : 'member',
+        email,
+        displayName,
+        role: LEGACY_MENTOR_EMAILS.includes(email.toLowerCase()) ? 'mentor' : 'member',
         createdAt: new Date(),
-        lastLogin: new Date()
+        lastLogin: new Date(),
       })
-      
+
       return result
-    } catch (error) {
-      setError(error.message)
-      throw error
-    } finally {
-      setLoading(false)
+    } catch (err) {
+      setError(err.message)
+      throw err
     }
   }
 
-  // Sign out
   const logout = async () => {
     try {
       setError(null)
       await signOut(auth)
       setUser(null)
       setUserRole(null)
-    } catch (error) {
-      setError(error.message)
-      throw error
+    } catch (err) {
+      setError(err.message)
+      throw err
     }
   }
 
-  // Check if user is mentor
-  const isMentor = userRole === 'mentor'
+  // Admin is a superset of mentor — both can access admin features
+  const isMentor = userRole === 'mentor' || userRole === 'admin'
+  // Admin role is stored in Firestore, not tied to a hardcoded email
+  const isAdmin = userRole === 'admin'
 
-  // Check if user is admin (specific mentor with admin privileges)
-  const isAdmin = isMentor && user?.email === 'admin@busa.kr'
+  // Root manager check — email-based, for protecting /setup
+  const isRootManager = !!(
+    ROOT_MANAGER_EMAIL &&
+    user?.email?.toLowerCase() === ROOT_MANAGER_EMAIL.toLowerCase()
+  )
 
   const value = {
     user,
@@ -189,11 +192,12 @@ export const AuthProvider = ({ children }) => {
     error,
     isMentor,
     isAdmin,
+    isRootManager,
     signInWithEmail,
     signInWithGoogle,
     signUpWithEmail,
     logout,
-    setError
+    setError,
   }
 
   return (
@@ -201,4 +205,4 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   )
-} 
+}

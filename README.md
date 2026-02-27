@@ -1,10 +1,12 @@
 # BUSA Speaking Club Web Application
 
 A comprehensive web platform designed to empower Uzbek students in Korea through English communication and community building. This application provides a complete solution for managing speaking club activities, member registrations, and event coordination.
+mentor1@busa.kr
 
 ## 🌟 Features
 
 ### For Members
+
 - **Event Registration**: Easy sign-up for speaking sessions and debates
 - **Session Calendar**: View upcoming events and past activities
 - **Success Stories**: Read testimonials from fellow members
@@ -12,6 +14,7 @@ A comprehensive web platform designed to empower Uzbek students in Korea through
 - **Mobile Responsive**: Works perfectly on all devices
 
 ### For Mentors/Administrators
+
 - **Admin Dashboard**: Complete control panel for managing all aspects
 - **Event Management**: Create, edit, and manage speaking sessions
 - **Member Management**: Track registrations and member information
@@ -32,25 +35,29 @@ A comprehensive web platform designed to empower Uzbek students in Korea through
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+ 
+
+- Node.js 18+
 - npm or yarn
 - Firebase account
 
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone [your-repo-url]
    cd uzkorea-speak-club
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Set up environment variables**
    Create a `.env.local` file in the root directory:
+
    ```env
    VITE_FIREBASE_API_KEY=your_api_key
    VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
@@ -61,6 +68,7 @@ A comprehensive web platform designed to empower Uzbek students in Korea through
    ```
 
 4. **Run the development server**
+
    ```bash
    npm run dev
    ```
@@ -100,11 +108,13 @@ src/
 ## 🌐 Deployment
 
 ### Vercel Deployment
+
 1. Connect your GitHub repository to Vercel
 2. Set environment variables in Vercel dashboard
 3. Deploy automatically on push to main branch
 
 ### Firebase Setup
+
 1. Create a Firebase project
 2. Enable Firestore, Authentication, and Storage
 3. Set up security rules
@@ -120,6 +130,7 @@ src/
 ## 📱 Responsive Design
 
 The application is fully responsive and optimized for:
+
 - Desktop computers
 - Tablets
 - Mobile phones

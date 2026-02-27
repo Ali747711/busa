@@ -42,8 +42,12 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/unauthorized" element={<Unauthorized />} />
               
-              {/* Setup route (temporary) */}
-              <Route path="/setup" element={<Setup />} />
+              {/* Setup route — root manager only */}
+              <Route path="/setup" element={
+                <ProtectedRoute requireRootManager={true}>
+                  <Setup />
+                </ProtectedRoute>
+              } />
 
               {/* Admin routes (protected, with admin layout) */}
               <Route path="/admin" element={

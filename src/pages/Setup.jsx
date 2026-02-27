@@ -1,12 +1,32 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { createMentorAccounts } from '../utils/createMentorAccounts'
 import { CheckCircle, AlertCircle, Users, Key, Plus, Trash2, Eye, EyeOff, Mail, User } from 'lucide-react'
 
 const Setup = () => {
+  const navigate = useNavigate()
   const [isCreating, setIsCreating] = useState(false)
   const [results, setResults] = useState([])
   const [isComplete, setIsComplete] = useState(false)
   const [showPasswords, setShowPasswords] = useState({})
+  const [countdown, setCountdown] = useState(5)
+
+  // After setup, Firebase has signed us in as the last created mentor.
+  // Redirect to /login so the root manager can sign back in.
+  useEffect(() => {
+    if (!isComplete) return
+    const interval = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(interval)
+          navigate('/login')
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [isComplete, navigate])
 
   // Initial mentor data (can be customized)
   const [mentorCredentials, setMentorCredentials] = useState([
@@ -117,6 +137,21 @@ const Setup = () => {
           <p className="text-lg text-gray-600">
             Customize and create mentor accounts for your admin dashboard
           </p>
+        </div>
+
+        {/* Sign-out warning */}
+        <div className="bg-amber-50 border border-amber-300 rounded-lg p-4 mb-6">
+          <div className="flex items-start">
+            <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5 mr-3 flex-shrink-0" />
+            <div>
+              <h3 className="text-sm font-semibold text-amber-800">Important: You will be signed out</h3>
+              <p className="text-sm text-amber-700 mt-1">
+                Firebase signs you in as each new mentor while creating accounts. After setup
+                completes you will be automatically redirected to the login page — sign back in
+                as the root manager to access the admin dashboard.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Instructions */}
@@ -281,7 +316,16 @@ const Setup = () => {
             <div className="text-center">
               <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-green-800 mb-2">Setup Complete!</h3>
-              <p className="text-green-600">All mentor accounts have been created successfully.</p>
+              <p className="text-green-600 mb-3">All mentor accounts have been created successfully.</p>
+              <p className="text-sm text-gray-500">
+                Redirecting to login in <span className="font-semibold">{countdown}</span>s — sign back in as the root manager.
+              </p>
+              <button
+                onClick={() => navigate('/login')}
+                className="mt-3 text-sm text-primary-600 underline hover:text-primary-800"
+              >
+                Go to login now
+              </button>
             </div>
           )}
         </div>

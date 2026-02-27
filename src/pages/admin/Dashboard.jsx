@@ -1,19 +1,18 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { 
-  Calendar, 
-  Users, 
-  Star, 
-  TrendingUp, 
+import {
+  Calendar,
+  Users,
+  Star,
   Plus,
   Clock,
   MapPin,
   Video,
-  Download,
   Eye,
-  Upload
+  Upload,
+  AlertCircle
 } from 'lucide-react'
-import { collection, query, orderBy, limit, getDocs, where } from 'firebase/firestore'
+import { collection, query, orderBy, limit, getDocs, where, getCountFromServer } from 'firebase/firestore'
 import { db } from '../../config/firebase'
 import LoadingSpinner from '../../components/LoadingSpinner'
 
@@ -26,6 +25,7 @@ const Dashboard = () => {
   })
   const [recentSessions, setRecentSessions] = useState([])
   const [loading, setLoading] = useState(true)
+  const [fetchError, setFetchError] = useState(null)
 
   useEffect(() => {
     fetchDashboardData()
@@ -34,70 +34,53 @@ const Dashboard = () => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true)
-      
-      // Fetch recent sessions
-      const sessionsQuery = query(
+      setFetchError(null)
+
+      // Fetch recent 5 sessions for the list
+      const recentQuery = query(
         collection(db, 'sessions'),
         orderBy('date', 'desc'),
         limit(5)
       )
-      const sessionsSnapshot = await getDocs(sessionsQuery)
-      const sessionsData = sessionsSnapshot.docs.map(doc => ({
+      const recentSnapshot = await getDocs(recentQuery)
+      const sessionsData = recentSnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
         date: doc.data().date?.toDate() || new Date()
       }))
-      
-      // Calculate stats
-      const totalSessions = sessionsSnapshot.size
-      const totalAttendees = sessionsData.reduce((sum, session) => sum + (session.attendees || 0), 0)
-      const averageRating = sessionsData.length > 0 
-        ? sessionsData.reduce((sum, session) => sum + (session.rating || 0), 0) / sessionsData.length 
-        : 0
-      
-      // Count upcoming sessions
-      const upcomingQuery = query(
-        collection(db, 'sessions'),
-        where('date', '>=', new Date())
+
+      // Total session count — not limited by the query above
+      const totalCountSnapshot = await getCountFromServer(collection(db, 'sessions'))
+      const totalSessions = totalCountSnapshot.data().count
+
+      // Sum attendees using the correct field name
+      const totalAttendees = sessionsData.reduce(
+        (sum, session) => sum + (session.currentAttendees || 0),
+        0
       )
-      const upcomingSnapshot = await getDocs(upcomingQuery)
-      
+
+      // Average rating (only sessions that have a rating)
+      const ratedSessions = sessionsData.filter(s => s.rating)
+      const averageRating = ratedSessions.length > 0
+        ? (ratedSessions.reduce((sum, s) => sum + s.rating, 0) / ratedSessions.length).toFixed(1)
+        : '—'
+
+      // Upcoming sessions count
+      const upcomingSnapshot = await getCountFromServer(
+        query(collection(db, 'sessions'), where('date', '>=', new Date()))
+      )
+
       setStats({
         totalSessions,
         totalAttendees,
-        averageRating: averageRating.toFixed(1),
-        upcomingSessions: upcomingSnapshot.size
+        averageRating,
+        upcomingSessions: upcomingSnapshot.data().count
       })
-      
+
       setRecentSessions(sessionsData)
-      
     } catch (error) {
       console.error('Error fetching dashboard data:', error)
-      // Use demo data as fallback
-      setStats({
-        totalSessions: 127,
-        totalAttendees: 1200,
-        averageRating: 4.8,
-        upcomingSessions: 4
-      })
-      setRecentSessions([
-        {
-          id: 1,
-          title: 'Advanced Speaking Techniques',
-          date: new Date('2024-12-15'),
-          type: 'zoom',
-          attendees: 45,
-          rating: 5
-        },
-        {
-          id: 2,
-          title: 'Monthly Debate Session',
-          date: new Date('2024-12-20'),
-          type: 'offline',
-          attendees: 32,
-          rating: 4.7
-        }
-      ])
+      setFetchError('Could not load dashboard data. Check your connection and try again.')
     } finally {
       setLoading(false)
     }
@@ -107,38 +90,46 @@ const Dashboard = () => {
     return <LoadingSpinner text="Loading dashboard..." />
   }
 
+  if (fetchError) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <AlertCircle className="w-12 h-12 text-red-400 mb-4" />
+        <h2 className="text-lg font-semibold text-gray-900 mb-2">Failed to load dashboard</h2>
+        <p className="text-sm text-gray-500 mb-4">{fetchError}</p>
+        <button
+          onClick={fetchDashboardData}
+          className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700"
+        >
+          Retry
+        </button>
+      </div>
+    )
+  }
+
   const statCards = [
     {
       name: 'Total Sessions',
       value: stats.totalSessions,
       icon: Calendar,
       color: 'bg-blue-500',
-      change: '+12%',
-      changeType: 'increase'
     },
     {
       name: 'Total Attendees',
       value: stats.totalAttendees.toLocaleString(),
       icon: Users,
       color: 'bg-green-500',
-      change: '+18%',
-      changeType: 'increase'
     },
     {
       name: 'Average Rating',
-      value: `${stats.averageRating}★`,
+      value: stats.averageRating === '—' ? '—' : `${stats.averageRating}★`,
       icon: Star,
       color: 'bg-yellow-500',
-      change: '+0.2',
-      changeType: 'increase'
     },
     {
       name: 'Upcoming Sessions',
       value: stats.upcomingSessions,
       icon: Clock,
       color: 'bg-primary-500',
-      change: '+3',
-      changeType: 'increase'
     }
   ]
 
@@ -158,19 +149,12 @@ const Dashboard = () => {
       color: 'bg-green-600 hover:bg-green-700'
     },
     {
-      name: 'View Calendar',
-      description: 'Check the session calendar',
-      href: '/admin/calendar',
-      icon: Calendar,
+      name: 'View Registrations',
+      description: 'Manage session registrations',
+      href: '/admin/registration',
+      icon: Users,
       color: 'bg-blue-600 hover:bg-blue-700'
     },
-    {
-      name: 'Export Data',
-      description: 'Download session reports',
-      href: '#',
-      icon: Download,
-      color: 'bg-gray-600 hover:bg-gray-700'
-    }
   ]
 
   return (
@@ -214,18 +198,8 @@ const Dashboard = () => {
                       <dt className="text-sm font-medium text-gray-500 truncate">
                         {stat.name}
                       </dt>
-                      <dd className="flex items-baseline">
-                        <div className="text-2xl font-semibold text-gray-900">
-                          {stat.value}
-                        </div>
-                        <div className="ml-2 flex items-baseline text-sm">
-                          <div className="text-green-600 font-medium">
-                            {stat.change}
-                          </div>
-                          <div className="text-gray-500 ml-1">
-                            vs last month
-                          </div>
-                        </div>
+                      <dd className="text-2xl font-semibold text-gray-900">
+                        {stat.value}
                       </dd>
                     </dl>
                   </div>
@@ -251,32 +225,41 @@ const Dashboard = () => {
                 View all
               </Link>
             </div>
-            <div className="space-y-3">
-              {recentSessions.map((session) => (
-                <div key={session.id} className="flex items-center p-3 bg-gray-50 rounded-lg">
-                  <div className="flex-shrink-0">
-                    {session.type === 'zoom' ? (
-                      <Video className="w-8 h-8 text-blue-500" />
-                    ) : (
-                      <MapPin className="w-8 h-8 text-green-500" />
-                    )}
+            {recentSessions.length === 0 ? (
+              <p className="text-sm text-gray-500 text-center py-6">No sessions yet.</p>
+            ) : (
+              <div className="space-y-3">
+                {recentSessions.map((session) => (
+                  <div key={session.id} className="flex items-center p-3 bg-gray-50 rounded-lg">
+                    <div className="flex-shrink-0">
+                      {session.type === 'zoom' ? (
+                        <Video className="w-8 h-8 text-blue-500" />
+                      ) : (
+                        <MapPin className="w-8 h-8 text-green-500" />
+                      )}
+                    </div>
+                    <div className="ml-4 flex-1">
+                      <p className="text-sm font-medium text-gray-900">
+                        {session.title}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        {session.date.toLocaleDateString()}
+                        {' • '}{session.currentAttendees ?? 0} attendees
+                        {session.rating ? ` • ${session.rating}★` : ''}
+                      </p>
+                    </div>
+                    <div className="flex-shrink-0">
+                      <Link
+                        to="/admin/sessions"
+                        className="text-gray-400 hover:text-gray-500"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Link>
+                    </div>
                   </div>
-                  <div className="ml-4 flex-1">
-                    <p className="text-sm font-medium text-gray-900">
-                      {session.title}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      {session.date.toLocaleDateString()} • {session.attendees} attendees • {session.rating}★
-                    </p>
-                  </div>
-                  <div className="flex-shrink-0">
-                    <button className="text-gray-400 hover:text-gray-500">
-                      <Eye className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -307,63 +290,8 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-
-      {/* Activity Timeline */}
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-4 py-5 sm:p-6">
-          <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-            Recent Activity
-          </h3>
-          <div className="flow-root">
-            <ul className="-mb-8">
-              <li>
-                <div className="relative pb-8">
-                  <div className="relative flex space-x-3">
-                    <div>
-                      <span className="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center ring-8 ring-white">
-                        <Plus className="w-4 h-4 text-white" />
-                      </span>
-                    </div>
-                    <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
-                      <div>
-                        <p className="text-sm text-gray-500">
-                          New session <span className="font-medium text-gray-900">"Advanced Speaking"</span> created
-                        </p>
-                      </div>
-                      <div className="text-right text-sm whitespace-nowrap text-gray-500">
-                        2 hours ago
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </li>
-              <li>
-                <div className="relative pb-8">
-                  <div className="relative flex space-x-3">
-                    <div>
-                      <span className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center ring-8 ring-white">
-                        <Upload className="w-4 h-4 text-white" />
-                      </span>
-                    </div>
-                    <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
-                      <div>
-                        <p className="text-sm text-gray-500">
-                          Photos uploaded for <span className="font-medium text-gray-900">December Debate</span>
-                        </p>
-                      </div>
-                      <div className="text-right text-sm whitespace-nowrap text-gray-500">
-                        1 day ago
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
     </div>
   )
 }
 
-export default Dashboard 
+export default Dashboard
